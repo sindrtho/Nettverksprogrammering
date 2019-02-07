@@ -1,1 +1,3 @@
 Nettverksprogrammering
+
+Øvinger i nettverksprogrammering.

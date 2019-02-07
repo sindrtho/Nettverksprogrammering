@@ -40,9 +40,9 @@ int main(int argc, char* argv[]) {
         higher = stoi(argv[2]) >= 0 ? stoi(argv[2]) : 10000000;
         threadcount = stoi(argv[3]) >= 1 ? stoi(argv[3]) : 4;
     } else {
-        lower = 10000000;
-        higher = 20000000;
-        threadcount = 8;
+        lower = 11;
+        higher = 13;
+        threadcount = 1;
     }
 
     if(lower <= 2) {
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 
     for(int i = 0; i < threadcount; i++) {
         threads.emplace_back([&lower, &higher, &stepsize, i, &primeList, &primeListMutex, &threadcount] {
-            primes(lower + 2*i, higher, stepsize, &primeList, &primeListMutex);
+            primes(lower + 2*i, ++higher, stepsize, &primeList, &primeListMutex);
         });
     }
 

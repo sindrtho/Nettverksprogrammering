@@ -27,7 +27,7 @@ void primes(int lowerLimit, int higherLimit, int stepSize, vector<int> *table, m
     }
 }
 
-int main(int argc, char* argv[]) {
+vector<int> aaa(int a, int b, int c) {
     int lower, higher, threadcount;
 
     vector<int> primeList;
@@ -35,15 +35,15 @@ int main(int argc, char* argv[]) {
     time_t start;
     time_t end;
 
-    if(argc >= 4) {
-        lower = stoi(argv[1]) >= 0 ? stoi(argv[1]) : 0;
-        higher = stoi(argv[2]) >= 0 ? stoi(argv[2]) : 10000000;
-        threadcount = stoi(argv[3]) >= 1 ? stoi(argv[3]) : 4;
-    } else {
-        lower = 11;
-        higher = 13;
-        threadcount = 1;
-    }
+//    if(argc >= 4) {
+//        lower = stoi(argv[1]) >= 0 ? stoi(argv[1]) : 0;
+//        higher = stoi(argv[2]) >= 0 ? stoi(argv[2]) : 10000000;
+//        threadcount = stoi(argv[3]) >= 1 ? stoi(argv[3]) : 4;
+//    } else {
+        lower = a;
+        higher = b;
+        threadcount = c;
+//    }
 
     if(lower <= 2) {
         primeList.push_back(2);
@@ -81,9 +81,9 @@ int main(int argc, char* argv[]) {
 
     cout << "Number of threads: " << threads.size() << endl;
 
-    for(int i : primeList) {
-        cout << i << endl;
-    }
+//    for(int i : primeList) {
+//        cout << i << endl;
+//    }
 
     cout << "Time elapsed: " << sec << "s" << endl; // Prints the time.
     cout << "Number of primes: " << primeList.size() << endl;
@@ -96,4 +96,5 @@ int main(int argc, char* argv[]) {
 //    }
 //    myFile.close();
 
+    return primeList;
 }

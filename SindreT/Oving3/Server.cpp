@@ -50,14 +50,14 @@ private:
                 if(params[0] == "add" && params.size() >= 3) {
                     try {
                         write_stream << k.calculate(params[1], params[2], '+') <<  "\r\n";
-                    } catch(exception e) {
-                        write_stream << "Invalid arguments" << "\r\n";
+                    } catch(exception &e) {
+                        write_stream << e.what() << "\r\n";
                     }
                 } else if(params[0] == "sub" && params.size() >= 3) {
                     try {
                         write_stream << k.calculate(params[1], params[2], '-') << "\r\n";
-                    } catch(exception e) {
-                        write_stream << "Invalid arguments" << "\r\n";
+                    } catch(exception &e) {
+                        write_stream << e.what() << "\r\n";
                     }
                 } else if(params[0] == "help") {
                     write_stream << helpMenu << "\r\n";

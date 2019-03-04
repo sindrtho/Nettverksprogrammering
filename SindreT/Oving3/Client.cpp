@@ -28,6 +28,7 @@ public:
                 boost::asio::async_connect(*socket, it, [this, socket](const boost::system::error_code &ec, tcp::resolver::iterator it) {
                     if(!ec) {
                         std::cout << "Connected" << std::endl;
+                        //sendMessage(socket);
 
                         auto write_buffer = make_shared<boost::asio::streambuf>();
                         ostream write_stream(write_buffer.get());
@@ -80,8 +81,9 @@ public:
 
                             cout << message << std::endl;
                         }
+                        sendMessage(socket);
                     }
-                    sendMessage(socket);
+                    //sendMessage(socket);
                 });
             }
         });
@@ -100,5 +102,5 @@ public:
 
 int main() {
     EchoClient client;
-    client.start("localhost", 80);
+    client.start("10.22.157.189", 80);
 }

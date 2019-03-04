@@ -15,7 +15,7 @@ private:
         Connection(boost::asio::io_service &io_service) : sock(io_service) {}
     };
 
-    const std::string helpMenu = "add:     Lets you add 2 numbers\nsub:     lets you subtract two numbers\nhelp:    show this menu again\nexit:    Exits the program and closes connecction to the server.\n";
+    const std::string helpMenu = "add:     Lets you add 2 numbers\nsub:     lets you subtract two numbers\nhelp:    show this menu again \nexit:    Exits the program and closes connecction to the server.\n";
     const std::string errorMessage = "We have some problem understanding your inentions.\nWrite 'help' for valid commands.\n";
 
     Kalkulator k = Kalkulator::getInstance();
@@ -51,7 +51,7 @@ private:
                     try {
                         write_stream << k.calculate(params[1], params[2], '+') <<  "\r\n";
                     } catch(exception e) {
-                        write_stream << "Invalid arguments" << endl;
+                        write_stream << "Invalid arguments" << "\r\n";
                     }
                 } else if(params[0] == "sub" && params.size() >= 3) {
                     try {
@@ -60,11 +60,11 @@ private:
                         write_stream << "Invalid arguments" << "\r\n";
                     }
                 } else if(params[0] == "help") {
-                    write_stream << helpMenu << endl;
+                    write_stream << helpMenu << "\r\n";
                 } else if(params[0] == "clear") {
                     write_stream << "";
                 } else {
-                    write_stream << errorMessage << endl;
+                    write_stream << errorMessage << "\r\n";
                 }
 
                 async_write(conn->sock, *write_buffer,

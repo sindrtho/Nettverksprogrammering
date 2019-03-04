@@ -43,6 +43,7 @@ public:
 
                                              cout << message << std::endl;
                                          }
+                                         sendMessage(socket);
                                      }
                                  });
                             }
@@ -52,6 +53,36 @@ public:
             }
         });
         io_service.run();
+    }
+
+    void sendMessage(const shared_ptr<tcp::socket> socket) {
+        auto write_buffer = make_shared<boost::asio::streambuf>();
+        ostream write_stream(write_buffer.get());
+
+        string msg;
+        cin >> msg;
+        write_stream << msg << "\r\n";
+
+        async_write(*socket, *write_buffer, [this, socket, write_buffer](const boost::system::error_code &ec, size_t) {
+            if (!ec) {
+                auto read_buffer = make_shared<boost::asio::streambuf>();
+                async_read_until(*socket, *read_buffer, "\r\n", [this, socket, read_buffer](
+                        const boost::system::error_code &ec, size_t) {
+                    if (!ec) {
+                        cout << "From server: ";
+                        std::string message;
+                        istream read_stream(read_buffer.get());
+                        while(getline(read_stream, message)) {
+                            message.pop_back();
+
+                            cout << message << std::endl;
+                        }
+                    }
+                });
+                sendMessage(socket);
+            }
+        });
+//        io_service.run();
     }
 };
 

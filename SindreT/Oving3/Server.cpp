@@ -49,15 +49,15 @@ private:
 
                 if(params[0] == "add" && params.size() >= 3) {
                     try {
-                        write_stream << k.calculate(params[1], params[2], '+') << endl << endl;
+                        write_stream << k.calculate(params[1], params[2], '+') <<  "\r\n";
                     } catch(exception e) {
                         write_stream << "Invalid arguments" << endl;
                     }
                 } else if(params[0] == "sub" && params.size() >= 3) {
                     try {
-                        write_stream << k.calculate(params[1], params[2], '-') << endl << endl;
+                        write_stream << k.calculate(params[1], params[2], '-') << "\r\n";
                     } catch(exception e) {
-                        write_stream << "Invalid arguments" << endl;
+                        write_stream << "Invalid arguments" << "\r\n";
                     }
                 } else if(params[0] == "help") {
                     write_stream << helpMenu << endl;
@@ -85,8 +85,8 @@ private:
                 auto write_buffer = make_shared<boost::asio::streambuf>();
                 ostream write_stream(write_buffer.get());
 
-                write_stream << "Successfully connected to server." << endl;
-                write_stream << helpMenu << endl;
+//                write_stream << "Successfully connected to server.\r\n" << endl;
+                write_stream << helpMenu << "\r\n";
 
                 async_write(conn->sock, *write_buffer,
                             [this, conn, write_buffer](const boost::system::error_code &ec, size_t) {

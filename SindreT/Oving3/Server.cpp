@@ -26,6 +26,7 @@ private:
     tcp::acceptor acceptor;
 
     void handle_request(shared_ptr<Connection> conn) {
+        cout << ">>New req waiting" << endl;
         auto read_buffer = make_shared<boost::asio::streambuf>();
 
         async_read_until(conn->sock, *read_buffer, "\r\n",
@@ -43,11 +44,14 @@ private:
 
                 vector<string> params;
                 boost::algorithm::split(params, message, boost::is_any_of(" "));
+                //cout << params[0] << endl;
+                //cout << params.size() << endl;
 
                 if(message == "exit")
                     return;
 
                 if(params[0] == "add" && params.size() >= 3) {
+                    //cout << "Got here" << endl;
                     try {
                         write_stream << k.calculate(params[1], params[2], '+') <<  "\r\n";
                     } catch(exception e) {
@@ -67,10 +71,16 @@ private:
                     write_stream << errorMessage << "\r\n";
                 }
 
+                cout << "Right before asyncwrite" << endl;
                 async_write(conn->sock, *write_buffer,
                         [this, conn, write_buffer](const boost::system::error_code &ec, size_t) {
+                    cout << "Inside asyncWrite 2" << endl;
                     if(!ec)
+                    {
+                        cout << "Handle new req" << endl;
                         handle_request(conn);
+                        io_service.run();
+                    }
                 });
             }
         });

@@ -23,7 +23,8 @@ public:
                         tcp::resolver::iterator it) {
                     if(!ec) {
                         std::cout << "Connected" << std::endl;
-
+                        sendMessage(socket);
+                        /*
                         auto write_buffer = make_shared<boost::asio::streambuf>();
                         ostream write_stream(write_buffer.get());
 
@@ -47,7 +48,7 @@ public:
                                      }
                                  });
                             }
-                        });
+                        });*/
                     }
                 });
             }
@@ -60,7 +61,8 @@ public:
         ostream write_stream(write_buffer.get());
 
         string msg;
-        cin >> msg;
+        getline(cin, msg);
+        //cout << msg << endl;
         write_stream << msg << "\r\n";
 
         async_write(*socket, *write_buffer, [this, socket, write_buffer](const boost::system::error_code &ec, size_t) {
@@ -78,8 +80,9 @@ public:
                             cout << message << std::endl;
                         }
                     }
+                    sendMessage(socket);
                 });
-                sendMessage(socket);
+
             }
         });
 //        io_service.run();

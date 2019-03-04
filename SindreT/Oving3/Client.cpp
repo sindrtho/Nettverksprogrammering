@@ -12,55 +12,58 @@ class EchoClient {
     tcp::resolver resolver;
 
 public:
-    EchoClient(const std::string &host, unsigned short port) : resolver(io_service) {
+    EchoClient() : resolver(io_service) {}
+
+    /**
+     * Initializes the client program.
+     * @param host Specifies the host to connect to.
+     * @param port Specifies the port to connect to the host through.
+     */
+    void init(const std::string &host, unsigned short port) {
         auto query = tcp::resolver::query(host, to_string(port));
 
-        resolver.async_resolve(query, [this](const boost::system::error_code &ec,
-                tcp::resolver::iterator it) {
+        resolver.async_resolve(query, [this](const boost::system::error_code &ec, tcp::resolver::iterator it) {
             if(!ec) {
                 auto socket = make_shared<tcp::socket>(io_service);
-                boost::asio::async_connect(*socket, it, [this, socket](const boost::system::error_code &ec,
-                        tcp::resolver::iterator it) {
+                boost::asio::async_connect(*socket, it, [this, socket](const boost::system::error_code &ec, tcp::resolver::iterator it) {
                     if(!ec) {
                         std::cout << "Connected" << std::endl;
 
                         auto write_buffer = make_shared<boost::asio::streambuf>();
                         ostream write_stream(write_buffer.get());
 
-                        write_stream << "Hello server!\r\n";
                         cout << "Hello client!" << endl;
-                        async_write(*socket, *write_buffer, [this, socket, write_buffer](const boost::system::error_code &ec, size_t) {
+                        auto read_buffer = make_shared<boost::asio::streambuf>();
+                        async_read_until(*socket, *read_buffer, "\r\n", [this, socket, read_buffer](
+                                const boost::system::error_code &ec, size_t) {
                             if (!ec) {
-                                auto read_buffer = make_shared<boost::asio::streambuf>();
-                                async_read_until(*socket, *read_buffer, "\r\n", [this, socket, read_buffer](
-                                         const boost::system::error_code &ec, size_t) {
-                                     if (!ec) {
-                                         cout << "From server: ";
-                                         std::string message;
-                                         istream read_stream(read_buffer.get());
-                                         while(getline(read_stream, message)) {
-                                             message.pop_back();
+                                cout << "From server: ";
+                                std::string message;
+                                istream read_stream(read_buffer.get());
+                                while(getline(read_stream, message)) {
+                                    message.pop_back();
 
-                                             cout << message << std::endl;
-                                         }
-                                         sendMessage(socket);
-                                     }
-                                 });
+                                    cout << message << std::endl;
+                                }
+                                sendMessage(socket);
                             }
                         });
                     }
                 });
             }
         });
-        io_service.run();
     }
 
+    /**
+     * Sends a messaege to the connected host.
+     * @param socket
+     */
     void sendMessage(const shared_ptr<tcp::socket> socket) {
         auto write_buffer = make_shared<boost::asio::streambuf>();
         ostream write_stream(write_buffer.get());
 
         string msg;
-        cin >> msg;
+        getline(cin, msg);
         write_stream << msg << "\r\n";
 
         async_write(*socket, *write_buffer, [this, socket, write_buffer](const boost::system::error_code &ec, size_t) {
@@ -78,14 +81,24 @@ public:
                             cout << message << std::endl;
                         }
                     }
+                    sendMessage(socket);
                 });
-                sendMessage(socket);
             }
         });
-//        io_service.run();
+    }
+
+    /**
+     * Starts the server.
+     * @param host
+     * @param port
+     */
+    void start(const std::string &host, unsigned short port) {
+        init(host, port);
+        io_service.run();
     }
 };
 
 int main() {
-    EchoClient client("localhost", 80);
+    EchoClient client;
+    client.start("localhost", 80);
 }

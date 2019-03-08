@@ -103,7 +103,7 @@ private:
     }
 
 public:
-    EchoServer() : endpoint(tcp::v4(), 80), acceptor(io_service, endpoint) {}
+    EchoServer() : endpoint(udp::v4(), 80), acceptor(io_service, endpoint) {}
 
     void start() {
         accept();

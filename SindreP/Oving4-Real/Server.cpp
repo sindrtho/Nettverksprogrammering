@@ -21,7 +21,7 @@ class Server {
     udp::socket socket_;
     udp::endpoint sender_endpoint_;
     enum { max_length = 1024 };
-    char data_[max_length];
+    //char data_[max_length];
 
     const std::string helpMenu = "add:     Lets you add 2 numbers\nsub:     lets you subtract two numbers\nhelp:    show this menu again \nexit:    Exits the program and closes connecction to the server.\n";
     const std::string errorMessage = "We have some problem understanding your inentions.\nWrite 'help' for valid commands.\n";
@@ -32,20 +32,22 @@ public:
         socket_(io_service, udp::endpoint(udp::v4(), port))
     {
         cout << "Starting up" << endl;
+        char data_[max_length];
         socket_.async_receive_from(
                 boost::asio::buffer(data_, max_length), sender_endpoint_,
                 boost::bind(&Server::handle_receive_from, this,
                             boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred));
+                            boost::asio::placeholders::bytes_transferred, data_));
     }
 
     void handle_receive_from(const boost::system::error_code& error,
-                             size_t bytes_recvd)
+                             size_t bytes_recvd, char newData[])
     {
+        char* data_ = newData;
         if (!error && bytes_recvd > 0)
         {
-            cout << "Recieved something: " << data_ << endl;
             string message = data_;
+            cout << "Recieved something: " << message << endl;
             vector<string> params;
             boost::algorithm::split(params, message, boost::is_any_of(" "));
             Kalkulator k = Kalkulator::getInstance();
@@ -53,37 +55,31 @@ public:
                 return;
             }
 
+            auto write_buffer = make_shared<boost::asio::streambuf>();
+            ostream write_stream(write_buffer.get());
             string temp;
             if(params[0] == "add" && params.size() >= 3) {
-                //cout << "Got here" << endl;
                 try {
-                    temp = k.calculate(params[1], params[2], '+') + "";
-                    strcpy(data_, temp.c_str());
+                    write_stream << k.calculate(params[1], params[2], '+');
                 } catch(exception &e) {
-                    temp = e.what();
-                    strcpy(data_, temp.c_str());
+                    write_stream << e.what();
                 }
             } else if(params[0] == "sub" && params.size() >= 3) {
                 try {
-                    temp = k.calculate(params[1], params[2], '-');
-                    strcpy(data_, temp.c_str());
+                    write_stream << k.calculate(params[1], params[2], '-');
                 } catch(exception &e) {
-                    temp = e.what();
-                    strcpy(data_, temp.c_str());
+                    write_stream << e.what();
                 }
             } else if(params[0] == "help") {
-                temp = helpMenu;
-                strcpy(data_, temp.c_str());
+                write_stream << helpMenu;
             } else if(params[0] == "clear") {
-                temp = "";
-                strcpy(data_, temp.c_str());
+                write_stream << "";
             } else {
-                temp = errorMessage;
-                strcpy(data_, temp.c_str());
+                write_stream << errorMessage;
             }
-            bytes_recvd = sizeof(data_);
+
             socket_.async_send_to(
-                    boost::asio::buffer(data_, bytes_recvd), sender_endpoint_,
+                    write_buffer->data(), sender_endpoint_,
                     boost::bind(&Server::handle_send_to, this,
                                 boost::asio::placeholders::error,
                                 boost::asio::placeholders::bytes_transferred));
@@ -94,7 +90,7 @@ public:
                     boost::asio::buffer(data_, max_length), sender_endpoint_,
                     boost::bind(&Server::handle_receive_from, this,
                                 boost::asio::placeholders::error,
-                                boost::asio::placeholders::bytes_transferred));
+                                boost::asio::placeholders::bytes_transferred, data_));
         }
     }
 
@@ -102,11 +98,12 @@ public:
                         size_t /*bytes_sent*/)
     {
         cout << "Sending to!" << endl;
+        char data_[max_length];
         socket_.async_receive_from(
                 boost::asio::buffer(data_, max_length), sender_endpoint_,
                 boost::bind(&Server::handle_receive_from, this,
                             boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred));
+                            boost::asio::placeholders::bytes_transferred, data_));
     }
 };
 

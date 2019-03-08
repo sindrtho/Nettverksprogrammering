@@ -95,7 +95,7 @@ public:
      * @param port
      */
     void start(const std::string &host, unsigned short port) {
-        init(host, port);su
+        init(host, port);
         io_service.run();
     }
 };

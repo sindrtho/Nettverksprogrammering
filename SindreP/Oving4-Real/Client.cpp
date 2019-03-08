@@ -1,106 +1,81 @@
-#include <iostream>
 #include <boost/asio.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/array.hpp>
+#include <boost/bind.hpp>
 #include <thread>
+#include <iostream>
+#include <boost/algorithm/string.hpp>
 #include "Kalkulator.cpp"
 
-using namespace boost::asio::ip;
+#define IPADDRESS "10.0.2.15" // "192.168.1.64"
+#define UDP_PORT_REC 8079
+#define UDP_PORT 8080
+
 using namespace std;
+using boost::asio::ip::udp;
+using boost::asio::ip::address;
+using namespace boost::asio::ip;
 
-class EchoClient {
+//Courtesy of https://stackoverflow.com/questions/44273599/udp-communication-using-c-boost-asio
+
+class Client {
     boost::asio::io_service io_service;
-    tcp::resolver resolver;
-
+    udp::socket socket{io_service};
+    boost::array<char, 1024> recv_buffer;
+    udp::endpoint remote_endpoint;
 public:
-    EchoClient() : resolver(io_service) {}
+    Client() {}
 
-    /**
-     * Initializes the client program.
-     * @param host Specifies the host to connect to.
-     * @param port Specifies the port to connect to the host through.
-     */
-    void init(const std::string &host, unsigned short port) {
-        auto query = tcp::resolver::query(host, to_string(port));
-
-        resolver.async_resolve(query, [this](const boost::system::error_code &ec, tcp::resolver::iterator it) {
-            if(!ec) {
-                auto socket = make_shared<tcp::socket>(io_service);
-                boost::asio::async_connect(*socket, it, [this, socket](const boost::system::error_code &ec, tcp::resolver::iterator it) {
-                    if(!ec) {
-                        std::cout << "Connected" << std::endl;
-                        //sendMessage(socket);
-
-                        auto write_buffer = make_shared<boost::asio::streambuf>();
-                        ostream write_stream(write_buffer.get());
-
-                        cout << "Hello client!" << endl;
-                        auto read_buffer = make_shared<boost::asio::streambuf>();
-                        async_read_until(*socket, *read_buffer, "\r\n", [this, socket, read_buffer](
-                                const boost::system::error_code &ec, size_t) {
-                            if (!ec) {
-                                cout << "From server: ";
-                                std::string message;
-                                istream read_stream(read_buffer.get());
-                                while(getline(read_stream, message)) {
-                                    message.pop_back();
-
-                                    cout << message << std::endl;
-                                }
-                                sendMessage(socket);
-                            }
-                        });
-                    }
-                });
-            }
-        });
+    void handle_receive(const boost::system::error_code& error, size_t bytes_transferred) {
+        if (error) {
+            std::cout << "Receive failed: " << error.message() << "\n";
+            return;
+        }
+        std::cout << "Received: '" << std::string(recv_buffer.begin(), recv_buffer.begin()+bytes_transferred) << "' (" << error.message() << ")\n";
+        sendMessage();
     }
 
-    /**
-     * Sends a messaege to the connected host.
-     * @param socket
-     */
-    void sendMessage(const shared_ptr<tcp::socket> socket) {
-        auto write_buffer = make_shared<boost::asio::streambuf>();
-        ostream write_stream(write_buffer.get());
+    void receive() {
+        socket.async_receive_from(boost::asio::buffer(recv_buffer),
+                                  remote_endpoint,
+                                  boost::bind(&Client::handle_receive, this,
+                                          boost::asio::placeholders::error,
+                                          boost::asio::placeholders::bytes_transferred)
+                                  );
+    }
 
+    void sendMessage() {
+        cout << "Input your shit:" << endl;
         string msg;
         getline(cin, msg);
-        write_stream << msg << "\r\n";
+        if(msg == "exit")
+        {
+            socket.close();
+            return;
+        }
 
-        async_write(*socket, *write_buffer, [this, socket, write_buffer](const boost::system::error_code &ec, size_t) {
-            if (!ec) {
-                auto read_buffer = make_shared<boost::asio::streambuf>();
-                async_read_until(*socket, *read_buffer, "\r\n", [this, socket, read_buffer](
-                        const boost::system::error_code &ec, size_t) {
-                    if (!ec) {
-                        cout << "From server: ";
-                        std::string message;
-                        istream read_stream(read_buffer.get());
-                        while(getline(read_stream, message)) {
-                            message.pop_back();
+        remote_endpoint = udp::endpoint(address::from_string(IPADDRESS), UDP_PORT);
 
-                            cout << message << std::endl;
-                        }
-                        sendMessage(socket);
-                    }
-                    //sendMessage(socket);
-                });
-            }
-        });
+        boost::system::error_code err;
+        auto sent = socket.send_to(boost::asio::buffer(msg), remote_endpoint, 0, err);
+        std::cout << "Sent Payload --- " << sent << "\n";
+
+        receive();
     }
 
-    /**
-     * Starts the server.
-     * @param host
-     * @param port
-     */
-    void start(const std::string &host, unsigned short port) {
-        init(host, port);
+    void Start()
+    {
+        socket.open(udp::v4());
+        socket.bind(udp::endpoint(address::from_string(IPADDRESS), UDP_PORT_REC));
+
+        sendMessage();
+
+        std::cout << "Receiving...\n";
         io_service.run();
+        std::cout << "Receiver exit\n";
     }
 };
 
-int main() {
-    EchoClient client;
-    client.start("localhost", 80);
+int main(int argc, char *argv[]) {
+    Client client;
+    client.Start();
 }

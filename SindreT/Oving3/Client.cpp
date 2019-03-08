@@ -100,7 +100,15 @@ public:
     }
 };
 
-int main() {
+int main(int argc, char *argv[]) {
     EchoClient client;
-    client.start("localhost", 80);
+    try {
+        if (argc >= 3) {
+            client.start(argv[1], stoi(argv[2]));
+        } else {
+            client.start("localhost", 80);
+        }
+    } catch(exception e) {
+        client.start("localhost", 80);
+    }
 }

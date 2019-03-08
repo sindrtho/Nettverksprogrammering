@@ -95,20 +95,12 @@ public:
      * @param port
      */
     void start(const std::string &host, unsigned short port) {
-        init(host, port);su
+        init(host, port);
         io_service.run();
     }
 };
 
-int main(int argc, char *argv[]) {
+int main() {
     EchoClient client;
-    try {
-        if (argc >= 3) {
-            client.start(argv[1], stoi(argv[2]));
-        } else {
-            client.start("localhost", 80);
-        }
-    } catch(exception e) {
-        client.start("localhost", 80);
-    }
+    client.start("localhost", 80);
 }

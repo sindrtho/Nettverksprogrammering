@@ -102,5 +102,5 @@ public:
 
 int main() {
     EchoClient client;
-    client.start("10.22.157.189", 80);
+    client.start("localhost", 80);
 }

@@ -6,7 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include "Kalkulator.cpp"
 
-#define IPADDRESS "10.0.2.15" // "192.168.1.64"
+#define IPADDRESS "10.22.149.2" // "192.168.1.64"
 #define UDP_PORT_REC 8079
 #define UDP_PORT 8080
 
@@ -30,7 +30,7 @@ public:
             std::cout << "Receive failed: " << error.message() << "\n";
             return;
         }
-        std::cout << "Received: '" << std::string(recv_buffer.begin(), recv_buffer.begin()+bytes_transferred) << "' (" << error.message() << ")\n";
+        std::cout << "Received: " << std::string(recv_buffer.begin(), recv_buffer.begin()+bytes_transferred) << "\n";
         sendMessage();
     }
 
@@ -44,7 +44,7 @@ public:
     }
 
     void sendMessage() {
-        cout << "Input your shit:" << endl;
+        cout << "Input:" << endl;
         string msg;
         getline(cin, msg);
         if(msg == "exit")
@@ -57,7 +57,7 @@ public:
 
         boost::system::error_code err;
         auto sent = socket.send_to(boost::asio::buffer(msg), remote_endpoint, 0, err);
-        std::cout << "Sent Payload --- " << sent << "\n";
+//        std::cout << "Sent Payload --- " << sent << "\n";
 
         receive();
     }
@@ -69,9 +69,8 @@ public:
 
         sendMessage();
 
-        std::cout << "Receiving...\n";
         io_service.run();
-        std::cout << "Receiver exit\n";
+        std::cout << "Good bye.\n";
     }
 };
 

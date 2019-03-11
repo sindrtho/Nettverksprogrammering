@@ -5,4 +5,11 @@ pass: password
 
 java -jar -Djavax.net.ssl.keyStore="C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\mykeystore\examplestore" -Djavax.net.ssl.keyStorePassword=password "C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\Oving4-SSLServer\dist\Oving4-SSLServer.jar"
 
-java -jar -Djavax.net.ssl.trustStore="C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\mykeystore\examplestore" -Djavax.net.ssl.trustStorePassword=password "C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\Oving4-SSLServer\dist\Oving4-SSLClient.jar"
+java -jar -Djavax.net.ssl.trustStore="C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\mykeystore\examplestore" -Djavax.net.ssl.trustStorePassword=password "C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\Oving4-SSL\dist\Oving4-SSLClient.jar"
+
+1. Kjør RawCap på setting 7 (localhost).
+2. Lagre i den .pcap fil
+3. Kjør server med over
+4. Kjør client med over
+5. Skriv stuff
+6. avslutt RawCap

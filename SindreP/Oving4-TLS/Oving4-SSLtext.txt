@@ -3,5 +3,6 @@ $ keytool -genkey -alias signFiles -keystore examplestore
 everything else: java
 pass: password
 
-java -jar -Djavax.net.ssl.keyStore=C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\mykeystore\examplestore -Djavax.net.ssl.keyStorePassword=password "C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\Oving4-SSLServer\dist\Oving4-SSLServer.jar"
+java -jar -Djavax.net.ssl.keyStore="C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\mykeystore\examplestore" -Djavax.net.ssl.keyStorePassword=password "C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\Oving4-SSLServer\dist\Oving4-SSLServer.jar"
 
+java -jar -Djavax.net.ssl.trustStore="C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\mykeystore\examplestore" -Djavax.net.ssl.trustStorePassword=password "C:\Users\sindr\Desktop\Nettverksprogrammering\SindreP\Oving4-TLS\Oving4-SSLServer\dist\Oving4-SSLClient.jar"

@@ -1,4 +1,0 @@
-$ keytool -genkey -alias signFiles -keystore examplestore
-
-everything else: java
-pass: password

@@ -110,6 +110,6 @@ public:
 int main()
 {
     boost::asio::io_service io_service;
-    Server s(io_service, 8080);
+    Server s(io_service, UDP_PORT);
     io_service.run();
 }

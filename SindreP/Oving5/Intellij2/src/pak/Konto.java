@@ -13,6 +13,7 @@ public class Konto implements Serializable{
     private int kontonr;
     private double saldo;
     private String eier;
+    private int laas = 0;
 
     public Konto(){}//m ha en konstruktor med tom parameterliste ihht JavaBeans standarden
 
@@ -25,6 +26,14 @@ public class Konto implements Serializable{
     //belop must be positive
     public void trekk(double belop){
         saldo -= belop;
+    }
+
+    public int getLaas(){
+        return laas;
+    }
+
+    public void inkLaas(){
+        laas++;
     }
 
     public int getKontonr() {

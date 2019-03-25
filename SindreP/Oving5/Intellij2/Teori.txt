@@ -1,0 +1,7 @@
+Optimistisk låsing:
+-Ekstra felt i db og entitet som heter laas
+-Hver gang man lagrer entiteten så økes feltet med 1.
+-Ved utlesning lagrer man laas-feltet lokalt og når man lagrer sjekker
+man om feltet er endret. Hvis det er det forkastes endringene, hvis ikke
+lagrer den.
+-En slags mutex/låse-variabel

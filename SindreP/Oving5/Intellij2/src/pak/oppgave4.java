@@ -1,5 +1,7 @@
 package pak;
 
+import org.hibernate.LockMode;
+
 import javax.persistence.*;
 import java.rmi.Naming;
 import java.util.List;
@@ -9,7 +11,7 @@ public class oppgave4 {
         System.out.println("Running oppg4!");
 
         (new myThread4()).start();
-        //(new myThread4()).start();
+        (new myThread4()).start();
     }
 }
 
@@ -22,8 +24,8 @@ class myThread4 extends Thread{
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        Konto myKonto = em.find(Konto.class,1, LockModeType.OPTIMISTIC);
-        Konto myKonto2 = em.find(Konto.class,0, LockModeType.OPTIMISTIC);
+        Konto myKonto = em.find(Konto.class,1);
+        Konto myKonto2 = em.find(Konto.class,0);
         System.out.println(">>>" + myKonto + "\n>>>" + myKonto2);
         myKonto.trekk(100);
         myKonto2.trekk(-100);

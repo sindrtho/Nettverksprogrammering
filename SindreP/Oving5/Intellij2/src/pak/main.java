@@ -38,36 +38,5 @@ public class main {
         em.flush();
         em.getTransaction().commit();
         em.close();
-
-        //oppgave 3: 2 klienter, få feil
-        (new myThread()).start();
-        (new myThread()).start();
-    }
-
-    public static void persistList(EntityManager em, List<Object> list){
-        for(int i = 0; i < list.size(); i++){
-            em.persist(list.get(i));
-        }
-    }
-}
-
-class myThread extends Thread{
-    @Override
-    public void run() {
-        System.out.println("Yo! Thread up and running!");
-        EntityManagerFactory entityManagerFactory = Persistence.
-                createEntityManagerFactory("Oving5Persistance");
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        Konto myKonto = em.find(Konto.class,1);
-        Konto myKonto2 = em.find(Konto.class,0);
-        System.out.println(">>>" + myKonto + "\n>>>" + myKonto2);
-        myKonto.trekk(100);
-        myKonto2.trekk(-100);
-
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
     }
 }

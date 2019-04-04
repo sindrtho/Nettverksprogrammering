@@ -7,7 +7,7 @@
 #include "Kalkulator.cpp"
 #include <boost/algorithm/string.hpp>
 
-#define IPADDRESS "10.0.2.15" // "192.168.1.64"
+#define IPADDRESS "192.168.1.64" // "192.168.1.64"
 #define UDP_PORT 8080
 
 using namespace std;

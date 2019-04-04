@@ -83,7 +83,6 @@ public:
                         }
                         sendMessage(socket);
                     }
-                    //sendMessage(socket);
                 });
             }
         });

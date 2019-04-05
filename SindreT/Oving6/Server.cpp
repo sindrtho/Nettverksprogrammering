@@ -127,7 +127,7 @@ private:
                 string protocol_switch = "HTTP/1.1 101 Switching Protocols\r\n";
                 string upgrade = "Upgrade: websocket\r\n";
                 string connection = "Connection: Upgrade\r\n";
-                string sec_websocket_accept = "Sec-WebSocket-Accaept: " + hashClientKey(&clientKey) + "\r\n\r\n";
+                string sec_websocket_accept = "Sec-WebSocket-Accept: " + hashClientKey(&clientKey) + "\r\n\r\n";
 
                 cout << hashClientKey(&clientKey) << endl;
 
@@ -144,15 +144,19 @@ private:
     }
 
     void sendMessage(shared_ptr<Connection> conn) {
-        auto write_buffer = make_shared<boost::asio::streambuf>();
-        ostream write_stream(write_buffer.get());
+        auto write_buffer2 = make_shared<boost::asio::streambuf>();
+        ostream write_stream2(write_buffer2.get());
 
         cout << "Welcome!" << endl;
 
-//        write_stream << "WTF!" << "\r\n\r\n";
+        auto FIN = 0b10000001;
+        string message = "Hello client!\nHandshake was a SUCCESS!";
 
-        async_write(conn->sock, *write_buffer,
-                    [this, conn, write_buffer](const boost::system::error_code &ec, size_t) {
+        write_stream2 << (unsigned char)FIN;
+        write_stream2 << (unsigned char)message.size() << message;
+
+        async_write(conn->sock, *write_buffer2,
+                    [this, conn, write_buffer2](const boost::system::error_code &ec, size_t) {
 
                     });
     }

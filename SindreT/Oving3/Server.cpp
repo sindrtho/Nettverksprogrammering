@@ -46,9 +46,7 @@ private:
 
                 if(message == "exit")
                     return;
-
                 if(params[0] == "add" && params.size() >= 3) {
-                    //cout << "Got here" << endl;
                     try {
                         write_stream << k.calculate(params[1], params[2], '+') <<  "\r\n";
                     } catch(exception &e) {
@@ -62,8 +60,6 @@ private:
                     }
                 } else if(params[0] == "help") {
                     write_stream << helpMenu << "\r\n";
-                } else if(params[0] == "clear") {
-                    write_stream << "";
                 } else {
                     write_stream << errorMessage << "\r\n";
                 }
@@ -88,7 +84,6 @@ private:
                 auto write_buffer = make_shared<boost::asio::streambuf>();
                 ostream write_stream(write_buffer.get());
 
-//                write_stream << "Successfully connected to server.\r\n" << endl;
                 write_stream << helpMenu << "\r\n";
 
                 async_write(conn->sock, *write_buffer,
@@ -97,9 +92,6 @@ private:
                                     handle_request(conn);
                             });
             }
-//            if(!ec) {
-//                handle_request(conn);
-//            }
         });
     }
 

@@ -54,7 +54,7 @@ static const char reverse_table[128] = {
         41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64
 };
 
-::std::string base64_encode(const ::std::string &bindata)
+::std::string base64_encode1(const ::std::string &bindata)
 {
     using ::std::string;
     using ::std::numeric_limits;
@@ -88,6 +88,60 @@ static const char reverse_table[128] = {
     assert(outpos <= retval.size());
     return retval;
 }
+
+// Code by René Nyffenegger rene.nyffenegger@adp-gmbh.ch
+static const std::string base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
+
+
+static inline bool is_base64(unsigned char c) {
+    return (isalnum(c) || (c == '+') || (c == '/'));
+}
+
+std::string base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
+    std::string ret;
+    int i = 0;
+    int j = 0;
+    unsigned char char_array_3[3];
+    unsigned char char_array_4[4];
+
+    while (in_len--) {
+        char_array_3[i++] = *(bytes_to_encode++);
+        if (i == 3) {
+            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+            char_array_4[3] = char_array_3[2] & 0x3f;
+
+            for(i = 0; (i <4) ; i++)
+                ret += base64_chars[char_array_4[i]];
+            i = 0;
+        }
+    }
+
+    if (i)
+    {
+        for(j = i; j < 3; j++)
+            char_array_3[j] = '\0';
+
+        char_array_4[0] = ( char_array_3[0] & 0xfc) >> 2;
+        char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+        char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+
+        for (j = 0; (j < i + 1); j++)
+            ret += base64_chars[char_array_4[j]];
+
+        while((i++ < 3))
+            ret += '=';
+
+    }
+
+    return ret;
+
+}
+
 
 class EchoServer {
 private:
@@ -147,7 +201,7 @@ private:
                          newKey = result[1];
                          cout << newKey << endl;
 
-                         //string code = Base64.encode(SHA-1(newKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"));
+                         //make this: string code = Base64.encode(SHA-1(newKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"));
 
                          boost::algorithm::trim(newKey);
                          newKey += (string)"258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
@@ -158,19 +212,10 @@ private:
                          char char_array[n + 1];
                          strcpy(char_array, newKey.c_str());
                          unsigned char hash[20];
-                         vector<unsigned char> myCharVec;
-                         myCHarVec = SHA1((unsigned char*)&char_array, sizeof(char_array) - 1, hash);
+                         SHA1((unsigned char*)&char_array, sizeof(char_array) - 1, hash);
 
-                         vector<unsigned char> myCharVec;
-                         for(auto& i : char_array){
-                             myCharVec.push_back(char_array[i]);
-                         }
-                         string hasedKey (char_array);
-
-                         cout << hasedKey << endl;
-
-                         //string encoded = Base64Encode(myCharVec);
-                         string encoded = base64_encode(hasedKey);
+                         cout << hash << endl;
+                         string encoded = base64_encode(hash, 20);
 
                          cout << "*** Encoded ***" << endl;
                          cout << encoded << endl;
@@ -179,44 +224,37 @@ private:
                          ostream write_stream(write_buffer.get());
 
                          write_stream << "HTTP/1.1 101 Switching Protocols"<< "\r\n";
-                         //write_stream << "HTTP/1.1 101 Web Socket Protocol Handshake" << "\r\n";
                          write_stream << "Upgrade: websocket"<< "\r\n";
                          write_stream << "Connection: Upgrade" << "\r\n";
                          write_stream << "Sec-WebSocket-Accept: " << encoded << "\r\n\r\n";
-                         //write_stream << "\r\n";
-                         //write_stream << "Sec-WebSocket-Protocol: chat \r\n\r\n";
-
-                         //cout << write_buffer << endl;
 
                          async_write(connection->socket, *write_buffer,
                                  [this, connection, write_buffer](const boost::system::error_code &ec, size_t) {
-                                     cout << "Wrote to socket" << endl;
-                             if (!ec)
-                                 std::this_thread::sleep_for(4s);
-                                         cout << "No error, sending hellos" << endl;
-                                     auto write_buffer2 = make_shared<boost::asio::streambuf>();
-                                     ostream write_stream2(write_buffer2.get());
-                                     //write_stream2 << "HTTP/1.1 200 OK\r\nContent-Length: 7"  << "\r\nContent-Type: text/html\r\n\r\n" << "HELLO!?" << "\r\n\r\n";
-                                    //write_stream2 << "hello \r\n\r\n" << endl;
+                             cout << "Wrote to socket" << endl;
+                             if (!ec){
+                                 //std::this_thread::sleep_for(1s);
+                                 cout << "No error, sending hellos" << endl;
+                                 auto write_buffer2 = make_shared<boost::asio::streambuf>();
+                                 ostream write_stream2(write_buffer2.get());
 
-                                     vector<unsigned char> bytes{0x81, 0x83, 0xb4,0xb5, 0x03, 0x2a, 0xdc, 0xd0, 0x6a};
-                                     size_t length = bytes[1] & 127;
-                                     size_t mask_start = 2;
-                                     size_t data_start = mask_start + 4;
-                                     for(size_t i = data_start; i < data_start + length; ++i){
-                                         cout << char(bytes[i] ^ bytes[mask_start + (i - data_start)%4]);
-                                         write_stream2 << char(bytes[i] ^ bytes[mask_start + (i - data_start)%4]);
+                                 auto FIN = 0b10000000;
+                                 auto OP_TEXT = 0b0001;
+                                 auto OP_CLOSE = 0b1000;
+                                 string myMessage = "Hello world";
+                                 cout << myMessage.size() << endl;
+                                 write_stream2 << (unsigned char) (FIN | OP_TEXT);
+                                 write_stream2 << (unsigned char) myMessage.size();
+                                 write_stream2 << myMessage;
+
+                                 async_write(connection->socket, *write_buffer2,
+                                     [this, connection, write_buffer2](const boost::system::error_code &ec, size_t) {
+                                     // If not error:
+                                     if (!ec){
+                                         cout << "Finished." << endl;
+                                         handle_request(connection);
                                      }
-                                     //cout << "\r\n\r\n" << endl;
-                                    cout << endl;
-
-                                     async_write(connection->socket, *write_buffer2,
-                                                 [this, connection, write_buffer2](const boost::system::error_code &ec, size_t) {
-                                                     // If not error:
-                                                     if (!ec)
-                                                         cout << "Finished." << endl;
-                                                     handle_request(connection);
-                                                 });
+                                 });
+                             }
                          });
 
                      } else{

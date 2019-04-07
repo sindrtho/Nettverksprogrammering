@@ -14,8 +14,8 @@ public class Konto implements Serializable{
     private double saldo;
     private String eier;
     //Optimistic lock
-    //@Version
-    //private long laas = 0;
+    @Version
+    private long laas = 0;
 
     public Konto(){}//m ha en konstruktor med tom parameterliste ihht JavaBeans standarden
 

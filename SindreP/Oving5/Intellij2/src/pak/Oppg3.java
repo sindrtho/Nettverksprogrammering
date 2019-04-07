@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 public class Oppg3 {
     public static void main(String[] args) throws Exception{
         //oppgave 3: 2 klienter, få feil
+        System.out.println("Running Oppgave 3");
         (new myThread()).start();
         (new myThread2()).start();
     }

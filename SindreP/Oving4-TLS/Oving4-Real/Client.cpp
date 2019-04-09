@@ -6,7 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include "Kalkulator.cpp"
 
-#define IPADDRESS "10.0.2.15" // "192.168.1.64"
+#define IPADDRESS "192.168.1.64" // "192.168.1.64"
 #define UDP_PORT_REC 8079
 #define UDP_PORT 8080
 

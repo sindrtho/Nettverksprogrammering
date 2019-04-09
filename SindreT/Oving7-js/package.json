@@ -1,0 +1,12 @@
+{
+  "name": "nononono",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "nodemon --exec babel-node src/index.js"
+  },
+  "dependencies": {
+    "node-rsa": "^1.0.5",
+    "express": "^4.16.4",
+    "sha1": "^1.1.1"
+  }
+}

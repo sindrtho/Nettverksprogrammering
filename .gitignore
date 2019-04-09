@@ -10,3 +10,5 @@ out/
 /SindreP/Oving4-SSLServer/build/
 /SindreP/Oving4-TLS/Oving4-SSLServer/build/
 .jar
+node_modules
+package-lock.json

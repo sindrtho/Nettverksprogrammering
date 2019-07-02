@@ -110,11 +110,12 @@ private:
                 string clientKey;
 
                 while(getline(read_stream, clientKey)) {
+                    cout << clientKey << endl;
                     if (regex_search(clientKey, regex("Sec-WebSocket-Key:"))) {
                         vector<string> myVect;
                         boost::algorithm::split(myVect, clientKey, boost::is_any_of(" "));
                         clientKey = myVect[1];
-                        break;
+//                        break;
                     }
                 }
 
@@ -147,12 +148,10 @@ private:
         auto write_buffer2 = make_shared<boost::asio::streambuf>();
         ostream write_stream2(write_buffer2.get());
 
-        cout << "Welcome!" << endl;
-
-        auto FIN = 0b10000001;
+        auto FLAG = 0b10000001;
         string message = "Hello client!\nHandshake was a SUCCESS!";
 
-        write_stream2 << (unsigned char)FIN;
+        write_stream2 << (unsigned char)FLAG;
         write_stream2 << (unsigned char)message.size() << message;
 
         async_write(conn->sock, *write_buffer2,

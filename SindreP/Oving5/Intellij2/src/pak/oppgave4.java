@@ -10,6 +10,8 @@ public class oppgave4 {
     public static void main(String[] args) throws Exception{
         System.out.println("Running oppg4!");
 
+        //Husk å sette @version
+
         (new myThread4()).start();
         (new myThread4()).start();
     }
